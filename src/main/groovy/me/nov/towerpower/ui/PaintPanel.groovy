@@ -3,7 +3,6 @@ package me.nov.towerpower.ui
 import me.nov.towerpower.Towerpower
 import org.apache.commons.math3.complex.Complex
 
-import javax.imageio.ImageIO
 import javax.swing.*
 import java.awt.*
 import java.awt.event.MouseAdapter
@@ -14,8 +13,8 @@ import java.awt.image.BufferedImage
 class PaintPanel extends JPanel {
 
 
-  Complex start = new Complex(-5, -4.5)
-  Complex end = new Complex(3.5, 4.5)
+  Complex start = new Complex(-10, -10)
+  Complex end = new Complex(10, 10)
 
   int resolution
   BufferedImage currentImg
@@ -32,9 +31,10 @@ class PaintPanel extends JPanel {
   int _resDoublingAmount = 6
   int _towerAccuracy = 8
   int _greenCalcType = 2
-  boolean _sinus
-  boolean _grid
-  boolean _updateBaseMode
+  boolean _sinus = false
+  boolean _grid = false
+  int _towerMode = 0
+
   PaintPanel() {
     this.addMouseListener(new MouseAdapter() {
       @Override
@@ -125,7 +125,7 @@ class PaintPanel extends JPanel {
       Point max = new Point(Math.max(enterPoint.x, exitPoint.x) as int, Math.max(enterPoint.y, exitPoint.y) as int)
       g2.drawRect(min.x as int, min.y as int, max.x - min.x as int, max.y - min.y as int)
     }
-    if(_grid) {
+    if (_grid) {
 
       def lY = (0 - start.imaginary / (end.imaginary - start.imaginary)) * height as int
       g2.drawLine(0, lY, width, lY)
@@ -242,7 +242,27 @@ class PaintPanel extends JPanel {
     def maxErr = 1 / (10**_towerAccuracy)
 
     for (i in 0..50) {
-      Complex top = _updateBaseMode ? point.pow(point) : orig.pow(point)
+      Complex top
+      switch (_towerMode) {
+        case 1:
+          top = point.pow(point)
+          break
+        case 2:
+          top = orig.pow(point.exp())
+          break
+        case 3:
+          top = point.pow(point.exp())
+          break
+        case 4:
+          top = orig.pow(point.sin())
+          break
+        case 5:
+          top = point.pow(point.sin())
+          break
+        default:
+          top = orig.pow(point)
+          break
+      }
 
       Complex diff = top.subtract(point)
 

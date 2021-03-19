@@ -119,6 +119,38 @@ class Towerpower extends JFrame {
     colMode.add(modulo)
     colMode.add(sinus)
     settings.add(colMode)
+    JMenu towerMode = new JMenu("Tower equation mode")
+    ButtonGroup tGroup = new ButtonGroup()
+    ActionListener towerAl = { ActionEvent e ->
+      paintPanel._towerMode = tGroup.findIndexOf {it == e.getSource() }
+      paintPanel.recalc()
+    }
+    def normal = new JRadioButtonMenuItem("Normal", true)
+    normal.addActionListener(towerAl)
+    tGroup.add(normal)
+    towerMode.add(normal)
+    def keep = new JRadioButtonMenuItem("Keep base")
+    keep.addActionListener(towerAl)
+    tGroup.add(keep)
+    towerMode.add(keep)
+    def exp = new JRadioButtonMenuItem("Exp")
+    exp.addActionListener(towerAl)
+    tGroup.add(exp)
+    towerMode.add(exp)
+    def keepAndExp = new JRadioButtonMenuItem("Keep base + exp")
+    keepAndExp.addActionListener(towerAl)
+    tGroup.add(keepAndExp)
+    towerMode.add(keepAndExp)
+    def sin = new JRadioButtonMenuItem("Sin")
+    sin.addActionListener(towerAl)
+    tGroup.add(sin)
+    towerMode.add(sin)
+    def keepAndSin = new JRadioButtonMenuItem("Keep base + sin")
+    keepAndSin.addActionListener(towerAl)
+    tGroup.add(keepAndSin)
+    towerMode.add(keepAndSin)
+
+    settings.add(towerMode)
 
     JCheckBoxMenuItem grid = new JCheckBoxMenuItem("Show grid")
     grid.addActionListener {
@@ -126,12 +158,6 @@ class Towerpower extends JFrame {
       paintPanel.repaint()
     }
     settings.add(grid)
-    JCheckBoxMenuItem baseMode = new JCheckBoxMenuItem("Update base mode")
-    baseMode.addActionListener {
-      paintPanel._updateBaseMode = baseMode.isSelected()
-      paintPanel.recalc()
-    }
-    settings.add(baseMode)
     bar.add(settings)
 
     JMenu help = new JMenu("Help")
