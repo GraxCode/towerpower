@@ -38,7 +38,7 @@ class DarkLookAndFeel {
         }
       }
     })
-    LafManager.installTheme(new PreferredThemeStyle(ContrastRule.STANDARD, ColorToneRule.LIGHT))
+    LafManager.installTheme(new PreferredThemeStyle(ContrastRule.STANDARD, ColorToneRule.DARK))
     UIManager.put("TextField.arc", 5)
   }
 }

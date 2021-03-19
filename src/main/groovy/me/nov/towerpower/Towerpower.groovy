@@ -21,7 +21,6 @@ class Towerpower extends JFrame {
 
   Towerpower() {
     this.initBounds()
-    // this.setIconImage(SwingUtils.iconToFrameImage(SwingUtils.getIcon("/goldKey.svg"), this))
     this.setTitle("Towerpower")
     this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE)
     this.addWindowListener(new ExitListener(this))

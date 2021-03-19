@@ -1,7 +1,9 @@
 # Towerpower [![Release](https://img.shields.io/github/v/release/GraxCode/towerpower)](https://github.com/GraxCode/idiots-pgp/releases) [![Downloads](https://img.shields.io/github/downloads/GraxCode/idiots-pgp/total)](https://github.com/GraxCode/towerpower/releases)
-A tool made in groovy to show the beauty of math. Visualizes the infinite exponentiation tower of each complex number on the plane:
-![equation](res/power.png)
-This is also called tetration escape. Towerpower also has an alternative mode where the base is updated each iteration.
+A tool made in groovy to show the beauty of math. Visualizes the infinite exponentiation tower of each complex number on the plane:\
+![equation](res/power.png)\
+This is also called tetration escape. Black means the equation exploded after some iterations.
+Towerpower also has an alternative mode where the base is updated each iteration.
+You can play with the settings to get even prettier results.
 ## Gallery
 
 ![ex1](res/ex1.png)

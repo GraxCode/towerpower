@@ -163,7 +163,6 @@ class PaintPanel extends JPanel {
       for (y in 0..resolution - 1)
         currentImg.setRGB(x, y, findPointColor(x, y))
 
-    ImageIO.write(currentImg, "png", new File("test.png"))
     for (iter in 0.._resDoublingAmount - 1) {
       resolution *= 2
       def oldImg = currentImg
