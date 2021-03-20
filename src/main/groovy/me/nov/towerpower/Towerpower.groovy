@@ -4,6 +4,7 @@ import com.github.weisj.darklaf.settings.ThemeSettings
 import me.nov.towerpower.laf.DarkLookAndFeel
 import me.nov.towerpower.listener.ExitListener
 import me.nov.towerpower.ui.PaintPanel
+import me.nov.towerpower.ui.KeepAspectRatioPanel
 
 import javax.imageio.ImageIO
 import javax.swing.*
@@ -68,7 +69,7 @@ class Towerpower extends JFrame {
     settings.add(maxRes)
 
     JMenu minColDif = new JMenu("Min color difference for refresh")
-    minColDif.add(generateSpinner(paintPanel._minPixelRefreshDif, 2, 256, { paintPanel._minPixelRefreshDif = it }))
+    minColDif.add(generateSpinner(paintPanel._minPixelRefreshDif, 2, 200, { paintPanel._minPixelRefreshDif = it }))
     settings.add(minColDif)
 
     JMenu modFlip = new JMenu("Color sensitivity")
@@ -84,7 +85,7 @@ class Towerpower extends JFrame {
     JMenu green = new JMenu("Green color calculation")
     ButtonGroup gGroup = new ButtonGroup()
     ActionListener acl = { ActionEvent e ->
-      paintPanel._greenCalcType = gGroup.findIndexOf {it == e.getSource() }
+      paintPanel._greenCalcType = gGroup.findIndexOf { it == e.getSource() }
       paintPanel.recalc()
     }
     def zero = new JRadioButtonMenuItem("No green")
@@ -106,7 +107,7 @@ class Towerpower extends JFrame {
     JMenu colMode = new JMenu("Color mode")
     ButtonGroup cGroup = new ButtonGroup()
     ActionListener colAl = { ActionEvent e ->
-      paintPanel._sinus = cGroup.findIndexOf {it == e.getSource() } == 1
+      paintPanel._sinus = cGroup.findIndexOf { it == e.getSource() } == 1
       paintPanel.recalc()
     }
     def modulo = new JRadioButtonMenuItem("Modulo", true)
@@ -122,7 +123,7 @@ class Towerpower extends JFrame {
     JMenu towerMode = new JMenu("Tower equation mode")
     ButtonGroup tGroup = new ButtonGroup()
     ActionListener towerAl = { ActionEvent e ->
-      paintPanel._towerMode = tGroup.findIndexOf {it == e.getSource() }
+      paintPanel._towerMode = tGroup.findIndexOf { it == e.getSource() }
       paintPanel.recalc()
     }
     def normal = new JRadioButtonMenuItem("Normal", true)
@@ -158,6 +159,12 @@ class Towerpower extends JFrame {
       paintPanel.repaint()
     }
     settings.add(grid)
+
+    JCheckBoxMenuItem aspectRatio = new JCheckBoxMenuItem("Keep aspect ratio", true)
+    aspectRatio.addActionListener {
+      paintPanel._keepAspectRatio = aspectRatio.isSelected()
+    }
+    settings.add(aspectRatio)
     bar.add(settings)
 
     JMenu help = new JMenu("Help")
@@ -191,8 +198,9 @@ class Towerpower extends JFrame {
 
   private void initializeFrame() {
     JPanel content = new JPanel(new BorderLayout())
-
-    content.add(paintPanel = new PaintPanel(), BorderLayout.CENTER)
+    paintPanel = new PaintPanel()
+    def mainFrame = new KeepAspectRatioPanel(paintPanel)
+    content.add(mainFrame, BorderLayout.CENTER)
     content.add(infoLabel = new JLabel("", SwingConstants.RIGHT), BorderLayout.PAGE_END)
     setContentPane(content)
   }

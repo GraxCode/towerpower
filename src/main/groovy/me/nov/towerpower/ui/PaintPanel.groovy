@@ -26,7 +26,7 @@ class PaintPanel extends JPanel {
 
   Stack<Complex[]> history = new Stack<>()
 
-  int _minPixelRefreshDif = 25
+  int _minPixelRefreshDif = 15
   double _colorSensitivity = 50
   int _resDoublingAmount = 6
   int _towerAccuracy = 8
@@ -34,6 +34,7 @@ class PaintPanel extends JPanel {
   boolean _sinus = false
   boolean _grid = false
   int _towerMode = 0
+  boolean _keepAspectRatio = true
 
   PaintPanel() {
     this.addMouseListener(new MouseAdapter() {
@@ -83,8 +84,13 @@ class PaintPanel extends JPanel {
         if (SwingUtilities.isRightMouseButton(mouseEvent))
           return
         def mp = ((JPanel) mouseEvent.getSource()).getMousePosition()
-        if (mp != null)
+        if (mp != null) {
           exitPoint = mp
+          if(_keepAspectRatio) {
+            def ar = (end.real - start.real) / (end.imaginary - start.imaginary)
+            exitPoint.y = (int) ((exitPoint.x - enterPoint.x) / ar + enterPoint.y)
+          }
+        }
         repaint()
       }
 
@@ -114,9 +120,10 @@ class PaintPanel extends JPanel {
 
   @Override
   void paint(Graphics g) {
+    super.paint(g)
     Graphics2D g2 = g as Graphics2D
-    g2.setColor(Color.white)
-    g2.fillRect(0, 0, width, height)
+    //g2.setColor(Color.white)
+    //g2.fillRect(0, 0, width, height)
     if (currentImg != null)
       g2.drawImage(currentImg, 0, 0, width, height, null)
     g2.setColor(Color.black)
@@ -157,7 +164,7 @@ class PaintPanel extends JPanel {
   def calcZoom() {
     resolutionRunners = []
     resolution = 16
-    currentImg = new BufferedImage(resolution, resolution, BufferedImage.TYPE_INT_RGB)
+    currentImg = new BufferedImage(resolution, resolution, BufferedImage.TYPE_INT_ARGB)
     // initial pass
     for (x in 0..resolution - 1)
       for (y in 0..resolution - 1)
@@ -166,7 +173,7 @@ class PaintPanel extends JPanel {
     for (iter in 0.._resDoublingAmount - 1) {
       resolution *= 2
       def oldImg = currentImg
-      currentImg = new BufferedImage(resolution, resolution, BufferedImage.TYPE_INT_RGB)
+      currentImg = new BufferedImage(resolution, resolution, BufferedImage.TYPE_INT_ARGB)
 
       Graphics g = currentImg.createGraphics()
       g.drawImage(oldImg, 0, 0, resolution, resolution, null)
@@ -206,18 +213,33 @@ class PaintPanel extends JPanel {
     def col = currentImg.getRGB(x, y)
     boolean should = false
 
-    if (x > 1 && colorDiff(currentImg.getRGB(x - 2, y), col) > _minPixelRefreshDif)
-      should = true
-    else if (y > 1 && colorDiff(currentImg.getRGB(x, y - 2), col) > _minPixelRefreshDif)
-      should = true
-    else if (x < resolution - 2 && colorDiff(currentImg.getRGB(x + 2, y), col) > _minPixelRefreshDif)
-      should = true
-    else if (y < resolution - 2 && colorDiff(currentImg.getRGB(x, y + 2), col) > _minPixelRefreshDif)
-      should = true
+    boolean canGoLeft = x > 1
+    boolean canGoDown = y > 1
+    boolean canGoRight = x < resolution - 2
+    boolean canGoUp = y < resolution - 2
 
-    if (should) {
-      currentImg.setRGB(x, y, findPointColor(x, y))
-    }
+
+
+    if (canGoLeft && colorDiff(currentImg.getRGB(x - 2, y), col) > _minPixelRefreshDif)
+      should = true
+    else if (canGoDown && colorDiff(currentImg.getRGB(x, y - 2), col) > _minPixelRefreshDif)
+      should = true
+    else if (canGoRight && colorDiff(currentImg.getRGB(x + 2, y), col) > _minPixelRefreshDif)
+      should = true
+    else if (canGoUp && colorDiff(currentImg.getRGB(x, y + 2), col) > _minPixelRefreshDif)
+      should = true
+    else if (canGoLeft && canGoDown && colorDiff(currentImg.getRGB(x - 2, y - 2), col) > _minPixelRefreshDif)
+      should = true
+    else if (canGoLeft && canGoUp && colorDiff(currentImg.getRGB(x - 2, y + 2), col) > _minPixelRefreshDif)
+      should = true
+    else if (canGoRight && canGoDown && colorDiff(currentImg.getRGB(x + 2, y - 2), col) > _minPixelRefreshDif)
+      should = true
+    else if (canGoRight && canGoUp && colorDiff(currentImg.getRGB(x + 2, y + 2), col) > _minPixelRefreshDif)
+      should = true
+    else
+      return
+
+    currentImg.setRGB(x, y, findPointColor(x, y))
   }
 
   private static float colorDiff(int a, int b) {
@@ -295,7 +317,7 @@ class PaintPanel extends JPanel {
         break
     }
 
-    return (pendulum(real, _colorSensitivity) * 255 as int << 16) | (pendulum(green, _colorSensitivity) * 255 as int << 8) | (pendulum(imag, _colorSensitivity) * 255 as int)
+    return (0xFF << 24) | (pendulum(real, _colorSensitivity) * 255 as int << 16) | (pendulum(green, _colorSensitivity) * 255 as int << 8) | (pendulum(imag, _colorSensitivity) * 255 as int)
   }
 
 
