@@ -13,8 +13,8 @@ import java.awt.image.BufferedImage
 class PaintPanel extends JPanel {
 
 
-  Complex start = new Complex(-10, -10)
-  Complex end = new Complex(10, 10)
+  Complex start = new Complex(-20, -20)
+  Complex end = new Complex(20, 20)
 
   int resolution
   BufferedImage currentImg
@@ -61,7 +61,17 @@ class PaintPanel extends JPanel {
         verP = max.y / (double) height
 
         end = new Complex(oldStart.real + (end.real - oldStart.real) * horP, oldStart.imaginary + (end.imaginary - oldStart.imaginary) * verP)
-
+        if(_keepAspectRatio) {
+          // ensure no floating point errors take overhand
+          end = new Complex(end.imaginary - start.imaginary + start.real, end.imaginary)
+        }
+        def dist = start.subtract(end)
+        if(Math.abs(dist.real) < 1E-14 || Math.abs(dist.imaginary) < 1E-14) {
+          def old = history.pop()
+          start = old[0]
+          end = old[1]
+          JOptionPane.showMessageDialog(PaintPanel.this, "Zoom exceeds 64-bit precision. Undo-ing.")
+        }
         exitPoint = enterPoint = null
         recalc()
       }
